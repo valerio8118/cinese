@@ -45,6 +45,10 @@ select{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--line);b
 const TM={ā:1,á:2,ǎ:3,à:4,ē:1,é:2,ě:3,è:4,ī:1,í:2,ǐ:3,ì:4,ō:1,ó:2,ǒ:3,ò:4,ū:1,ú:2,ǔ:3,ù:4,ǖ:1,ǘ:2,ǚ:3,ǜ:4};
 const cp=s=>s.replace(/[A-Za-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/g,w=>{let t=0;for(const c of w.toLowerCase())if(TM[c])t=TM[c];return t?`<b class="t${t}">${w}</b>`:w});
 const L=[
+{id:"p",nf:1,t:"📌 Pronuncia: i suoni difficili",n:"Valori approssimativi, spiegati con suoni italiani e francesi. Premi 🔊 e ripeti: l'orecchio conta più della regola.",r:[
+["Q · come «ci» di cielo (qī = sette)","qī","七"],["X · come «sci» di scia, ma più leggero (xiè xie = grazie)","xiè xie","谢谢"],["ZH · come «gi» di giro, ma duro (zhè = questo)","zhè","这"],["C · come «z» di pizza (cài = piatto, verdura)","cài","菜"],["Z · come «ds» di lids (zài = essere in)","zài","在"],["R · tra la «r» e la «j» francesi (rén = persona)","rén","人"],["Ü · come la «u» francese di tu (nǚ = donna)","nǚ","女"],["IAN · si legge «ien» (qián = soldi)","qián","钱"],["E finale · «e» molto chiusa, quasi «ö» (de)","de","的"]]},
+{id:"q",t:"📌 Frasi essenziali con pronuncia",n:"In corsivo trovi come si legge all'italiana. È una guida per leggere al volo: i toni però vanno ascoltati con 🔊.",r:[
+["Ciao / Salve","Nǐ hǎo","你好","ni hào"],["Grazie","Xiè xie","谢谢","sié-sié"],["Prego / Di nulla","Bú kè qi","不客气","bu che-ci"],["Scusi (per chiedere)","Qǐng wèn","请问","cing uèn"],["Mi scusi (per un errore)","Duì bu qǐ","对不起","duei-bu-ci"],["Sì / Esatto","Duì","对","duèi"],["No / Non è così","Bú shì","不是","bu shrr"],["Non capisco","Wǒ bù dǒng","我不懂","uo bu dong"],["Parla inglese?","Nǐ huì shuō Yīng yǔ ma?","你会说英语吗？","ni huei shuo ing-iu ma"],["Quanto costa?","Duō shao qián?","多少钱？","duo-shao cién"],["Troppo caro","Tài guì le","太贵了","tai guei le"],["Dov'è il bagno?","Xǐ shǒu jiān zài nǎ lǐ?","洗手间在哪里？","si-shou-cien dsai na-li"],["Aiuto!","Jiù mìng!","救命！","ciu-ming"],["Non serve, grazie","Bú yòng le, xiè xie","不用了，谢谢","bu iong le, sié-sié"],["Va bene / D'accordo","Hǎo de","好的","hao de"],["Un po'","Yì diǎn diǎn","一点点","i-dien-dien"]]},
 {id:"a",t:"Lezione 1 · Cina, lingua e toni",n:"La Cina riconosce <b>56 gruppi etnici</b>; gli Han sono oltre il 90% (poi Tibetani, Uiguri, Mongoli, Miao, Hui). La lingua ufficiale è il <b>mandarino</b>; esistono anche cantonese e shanghainese.<br>Il mandarino ha <b>4 toni</b>: la stessa sillaba <i>ma</i> cambia significato. Ascolta e ripeti le quattro versioni.",r:[
 ["Cina","Zhōng guó","中国"],["Pechino","Běi jīng","北京"],["Mandarino (lingua ufficiale)","Pǔ tōng huà","普通话"],
 ["mamma (1° tono)","mā","妈"],["canapa (2° tono)","má","麻"],["cavallo (3° tono)","mǎ","马"],["insultare (4° tono)","mà","骂"]]},
@@ -65,8 +69,8 @@ const L=[
 ["riso","mǐ fàn","米饭"],["spaghetti / noodles","miàn tiáo","面条"],["ravioli cinesi","jiǎo zi","饺子"],["zuppa","tāng","汤"],["verdure","shū cài","蔬菜"],["carne","ròu","肉"],["pesce","yú","鱼"],["pollo","jī ròu","鸡肉"],["manzo","niú ròu","牛肉"],["maiale","zhū ròu","猪肉"],["gamberi","xiā","虾"],
 ["Coca Cola","kě kǒu kě lè","可口可乐"],["acqua naturale","kuàng quán shuǐ","矿泉水"],["acqua frizzante","qì pào shuǐ","气泡水"],["latte","niú nǎi","牛奶"],["tè","chá","茶"],["caffè","kā fēi","咖啡"],["mangiare","chī","吃"],["buono (da mangiare)","hǎo chī","好吃"],["bello (da vedere)","hǎo kàn","好看"],["cane","gǒu","狗"],["gatto","māo","猫"],
 ["Posso avere una forchetta?","Kě yǐ gěi wǒ yì bǎ chā zi ma?","可以给我一把叉子吗？"],["Posso avere le bacchette?","Kě yǐ gěi wǒ yì shuāng kuài zi ma?","可以给我一双筷子吗？"],["Posso avere un bicchiere d'acqua?","Kě yǐ gěi wǒ yì bēi shuǐ ma?","可以给我一杯水吗？"],
-["Questo è piccante?","Zhè ge là ma?","这个辣吗？"],["Che cosa consigliate?","Yǒu shén me tuī jiàn?","有什么推荐？"],["Questo è vegetariano?","Zhè ge shì sù de ma?","这个是素的吗？"],["Vorrei questo","Wǒ xiǎng yào zhè ge","我想要这个"],["Non voglio piccante","Bú yào là","不要辣"],["Poco piccante","Shǎo fàng là","少放辣"],
-["Quanto costa?","Duō shao qián?","多少钱？"],["Quanto costa questo?","Zhè ge duō shao qián?","这个多少钱？"],["È troppo caro","Tài guì le","太贵了"],["Il conto, per favore","Mǎi dān","买单"]]},
+["Questo è piccante?","Zhè ge là ma?","这个辣吗？"],["È molto piccante?","Hěn là ma?","很辣吗？"],["Che cosa consigliate?","Yǒu shén me tuī jiàn?","有什么推荐？"],["Questo è vegetariano?","Zhè ge shì sù de ma?","这个是素的吗？"],["Vorrei questo","Wǒ xiǎng yào zhè ge","我想要这个"],["Non voglio piccante","Bú yào là","不要辣"],["Mettete poco piccante","Shǎo fàng là","少放辣"],
+["Quanto costa?","Duō shao qián?","多少钱？"],["Quanto costa questo?","Zhè ge duō shao qián?","这个多少钱？"],["È troppo caro","Tài guì le","太贵了"],["Il conto, per favore","Mǎi dān","买单"],["Avete dei fazzoletti?","Yǒu zhǐ jīn ma?","有纸巾吗？"]]},
 {id:"g",t:"Lezione 5 · Chiedere indicazioni",n:"Per chiedere: <b>Qǐng wèn</b> (scusi, posso chiedere…) + luogo + <b>zài nǎr?</b> (dov'è?).<br>Per i mezzi si usa <b>zuò</b> (prendere): <i>zuò dì tiě</i>. A piedi: <i>zǒu lù</i>. Se non capisci: <i>Qǐng nín zài shuō yí biàn, hǎo ma?</i>",r:[
 ["Scusi, dov'è la stazione della metro?","Qǐng wèn, dì tiě zhàn zài nǎr?","请问，地铁站在哪儿？"],["Come si arriva al museo?","Qù bó wù guǎn zěn me zǒu?","去博物馆怎么走？"],["È lontano da qui?","Lí zhè lǐ yuǎn ma?","离这里远吗？"],["Quanto ci vuole?","Yào duō jiǔ?","要多久？"],["A piedi o in macchina?","Zǒu lù hái shì zuò chē?","走路还是坐车？"],
 ["Vai dritto","Yì zhí zǒu","一直走"],["Gira a sinistra","Zuǒ zhuǎn","左转"],["Gira a destra","Yòu zhuǎn","右转"],["Attraversa la strada","Guò mǎ lù","过马路"],["Arriva al semaforo","Dào hóng lǜ dēng","到红绿灯"],["È di fronte","Zài duì miàn","在对面"],["È accanto","Zài páng biān","在旁边"],["È nelle vicinanze","Zài fù jìn","在附近"],
@@ -98,19 +102,19 @@ if(can){pick();speechSynthesis.onvoiceschanged=pick}
 function say(z){if(!can)return;
  const go=()=>{const u=new SpeechSynthesisUtterance(z);u.lang='zh-CN';if(ZV)u.voice=ZV;u.rate=.8;speechSynthesis.resume();speechSynthesis.speak(u)};
  if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(go,120)}else go()}
-$('les').innerHTML=L.map((s,i)=>`<details${i?'':' open'}><summary>${s.t}</summary><div class="body"><p class="note">${s.n}</p>${s.r.map(r=>`<div class="row">${can?`<button class="sp" data-z="${r[2]}" aria-label="Ascolta">🔊</button>`:''}<div class="tx"><span class="py">${cp(r[1])}</span><span class="it">${r[0]}</span></div></div>`).join('')}</div></details>`).join('');
+$('les').innerHTML=L.map((s,i)=>`<details${i?'':' open'}><summary>${s.t}</summary><div class="body"><p class="note">${s.n}</p>${s.r.map(r=>`<div class="row">${can?`<button class="sp" data-z="${r[2]}" aria-label="Ascolta">🔊</button>`:''}<div class="tx"><span class="py">${cp(r[1])}</span><span class="it">${r[0]}</span>${r[3]?`<span class="it"><i>si legge «${r[3]}»</i></span>`:''}</div></div>`).join('')}</div></details>`).join('');
 $('les').onclick=e=>{const b=e.target.closest('.sp');if(b)say(b.dataset.z)};
 // flashcards
-const ALL=L.flatMap(s=>s.r.map(r=>({id:s.id,it:r[0],py:r[1],zh:r[2],k:r[1]})));
+const ALL=L.flatMap(s=>s.nf?[]:s.r.map(r=>({id:s.id,it:r[0],py:r[1],zh:r[2],pr:r[3],k:r[1]})));
 let known=new Set();try{known=new Set(JSON.parse(localStorage.getItem('cn-known')||'[]'))}catch(e){}
 const save=()=>{try{localStorage.setItem('cn-known',JSON.stringify([...known]))}catch(e){}};
 let deck=[],i=0,flip=false,rev=false;
-$('deck').innerHTML='<option value="all">Tutte le carte</option><option value="rep">Da ripassare</option>'+L.map(s=>`<option value="${s.id}">${s.t}</option>`).join('');
-function build(){const v=$('deck').value;deck=ALL.filter(c=>v==='all'||(v==='rep'?!known.has(c.k):c.id===v));i=0;flip=false;draw()}
+$('deck').innerHTML='<option value="all">Tutte le carte</option><option value="rep">Da ripassare</option>'+L.filter(s=>!s.nf).map(s=>`<option value="${s.id}">${s.t}</option>`).join('');
+function build(){const v=$('deck').value;deck=ALL.filter(c=>v==='all'||(v==='rep'?!known.has(c.k):c.id===v));if(v==='all'||v==='rep'){const sn=new Set();deck=deck.filter(c=>{const k=c.k.toLowerCase().replace(/[\s?!,.]/g,'');return !sn.has(k)&&sn.add(k)})}i=0;flip=false;draw()}
 function draw(){$('res').textContent='';
  if(!deck.length){$('card').innerHTML='<span class="big">Nessuna carta</span><span class="hint">Scegli un altro mazzo</span>';$('stat').textContent='';return}
  const c=deck[i],front=rev?`<span class="big">${cp(c.py)}</span>`:`<span class="big">${c.it}</span>`,back=rev?`<span class="big">${c.it}</span>`:`<span class="big">${cp(c.py)}</span>`;
- $('card').innerHTML=flip?back+`<span class="hint">${c.zh}</span>`:front+'<span class="hint">Tocca per girare</span>';
+ $('card').innerHTML=flip?back+`<span class="hint">${c.zh}${c.pr?' · si legge «'+c.pr+'»':''}</span>`:front+'<span class="hint">Tocca per girare</span>';
  $('stat').textContent=`Carta ${i+1} di ${deck.length} · sapute in totale: ${known.size} su ${ALL.length}`}
 const next=()=>{if(!deck.length)return;i=(i+1)%deck.length;flip=false;draw()};
 $('card').onclick=()=>{if(!deck.length)return;flip=!flip;draw();if(flip&&!rev)say(deck[i].zh)};
