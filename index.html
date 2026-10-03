@@ -95,7 +95,9 @@ const $=id=>document.getElementById(id);
 const can='speechSynthesis' in window;
 let ZV=null;const pick=()=>{ZV=speechSynthesis.getVoices().find(v=>/^zh/i.test(v.lang))||null};
 if(can){pick();speechSynthesis.onvoiceschanged=pick}
-function say(z){if(!can)return;speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(z);u.lang='zh-CN';if(ZV)u.voice=ZV;u.rate=.8;speechSynthesis.resume();speechSynthesis.speak(u)},120)}
+function say(z){if(!can)return;
+ const go=()=>{const u=new SpeechSynthesisUtterance(z);u.lang='zh-CN';if(ZV)u.voice=ZV;u.rate=.8;speechSynthesis.resume();speechSynthesis.speak(u)};
+ if(speechSynthesis.speaking||speechSynthesis.pending){speechSynthesis.cancel();setTimeout(go,120)}else go()}
 $('les').innerHTML=L.map((s,i)=>`<details${i?'':' open'}><summary>${s.t}</summary><div class="body"><p class="note">${s.n}</p>${s.r.map(r=>`<div class="row">${can?`<button class="sp" data-z="${r[2]}" aria-label="Ascolta">🔊</button>`:''}<div class="tx"><span class="py">${cp(r[1])}</span><span class="it">${r[0]}</span></div></div>`).join('')}</div></details>`).join('');
 $('les').onclick=e=>{const b=e.target.closest('.sp');if(b)say(b.dataset.z)};
 // flashcards
