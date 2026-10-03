@@ -156,27 +156,28 @@ function report(r){
  const bad=r.filter(x=>!x.ok);
  return (bad.length?'🟡 Controlla le sillabe con ❌:':'✅ Toni corretti!')+'<br>'+r.map(x=>x.ok?`✅ ${cp(x.w)}`:`❌ ${cp(x.w)}: dovevi fare il ${x.exp}° tono (${TN[x.exp]}), si sente il ${x.got}° (${TN[x.got]})`).join('<br>')+'<br><small>Analisi approssimativa: valuta solo l\'andamento dei toni, non consonanti e vocali.</small>'}
 
-let ownURL=null;
+let ownURL=null,rec=null;
+function setMic(on){const b=$('mic');b.textContent=on?'⏹ Ferma e controlla':'🎤 Prova a dirlo';b.classList.toggle('on',!!on)}
 async function recPlay(c,why){const res=$('res');
  try{const st=await navigator.mediaDevices.getUserMedia({audio:true}),m=new MediaRecorder(st),ch=[];
  m.ondataavailable=e=>ch.push(e.data);
- m.onstop=async()=>{st.getTracks().forEach(t=>t.stop());const b=new Blob(ch,{type:m.mimeType});let out;
+ m.onstop=async()=>{st.getTracks().forEach(t=>t.stop());rec=null;setMic(0);const b=new Blob(ch,{type:m.mimeType});let out;
   try{const ctx=new (window.AudioContext||window.webkitAudioContext)(),buf=await ctx.decodeAudioData(await b.arrayBuffer());out=report(analyze(pitch(buf),tones(c.py)));ctx.close()}
   catch(x){out='Registrazione fatta, ma non riesco ad analizzarla ('+(x&&x.name||'errore')+').'}
   ownURL=URL.createObjectURL(b);
   res.innerHTML=out+'<br><button class="btn" id="own" style="margin-top:8px">▶ Riascolta la tua voce</button>';
   $('own').onclick=()=>new Audio(ownURL).play()};
- res.textContent=(why?'Controllo automatico non disponibile ('+why+'): analizzo i toni dalla registrazione. ':'')+`🎤 Registro 5 secondi: di' «${c.py}»`;
- m.start();setTimeout(()=>m.stop(),5000)}
+ res.textContent=(why?'Controllo automatico non disponibile ('+why+'): analizzo i toni dalla registrazione. ':'')+`🎤 Sto registrando: di' «${c.py}» e premi ⏹ per controllare.`;
+ m.start();rec={stop:()=>{if(m.state==='recording')m.stop()}};setMic(1);setTimeout(()=>{if(m.state==='recording')m.stop()},20000)}
  catch(x){res.textContent='Il microfono è bloccato ('+(x&&x.name||'errore')+'). Su iPhone: Impostazioni → il tuo browser → Microfono, oppure in Safari tocca aA → Impostazioni sito web → Microfono.'}}
 const hz=s=>s.replace(/[^\u4e00-\u9fff]/g,'');
 function lev(a,b){const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
 $('mic').onclick=()=>{
- if(!deck.length)return;const c=deck[i],t=hz(c.zh),res=$('res');
+ if(rec){rec.stop();return}if(!deck.length)return;const c=deck[i],t=hz(c.zh),res=$('res');
  if(!SR){recPlay(c);return}
- let done=0;const r=new SR();r.lang='zh-CN';r.maxAlternatives=5;r.interimResults=false;
- res.textContent='🎤 Ti ascolto… di\' «'+c.py+'»';
- r.onresult=e=>{done=1;
+ let done=0;const r=new SR();rec={sr:r,stop:()=>r.stop()};const fin=()=>{if(rec&&rec.sr===r){rec=null;setMic(0)}};setMic(1);r.lang='zh-CN';r.maxAlternatives=5;r.interimResults=false;
+ res.textContent='🎤 Ti ascolto… di\' «'+c.py+'» e premi ⏹ quando hai finito.';
+ r.onresult=e=>{done=1;fin();
   const alts=[...e.results[0]].map(a=>hz(a.transcript)).filter(Boolean);
   if(!alts.length){res.textContent='Non ho sentito nulla di chiaro. Riprova.';return}
   let best=alts[0],sc=-1;for(const a of alts){const s=1-lev(a,t)/Math.max(a.length,t.length);if(s>sc){sc=s;best=a}}
@@ -184,8 +185,8 @@ $('mic').onclick=()=>{
   res.innerHTML=sc>=1?'✅ Perfetto: ti ha capito esattamente.'
    :sc>=.6?`🟡 Quasi. Ha sentito «${diff}» invece di «${t}». Le sillabe in rosso sono diverse: controlla i toni e riprova.`
    :`🔴 Non è stato riconosciuto. Ha sentito «${best}». Premi 🔊, ascolta e ripeti più lentamente.`};
- r.onerror=e=>{done=1;if(['not-allowed','service-not-allowed','aborted','audio-capture','language-not-supported'].includes(e.error)){recPlay(c,e.error);return}res.textContent=e.error==='not-allowed'||e.error==='service-not-allowed'?'Microfono non consentito: attivalo nelle impostazioni del browser.':e.error==='no-speech'?'Non ho sentito nulla. Riprova.':e.error==='aborted'?'Interrotto. Se è apparsa la richiesta del microfono, scegli «Consenti» e premi di nuovo 🎤.':'Riconoscimento non disponibile ('+e.error+').'};
- r.onend=()=>{if(!done)res.textContent='Non ho sentito nulla. Premi 🎤 e parla subito.'};
+ r.onerror=e=>{done=1;fin();if(['not-allowed','service-not-allowed','aborted','audio-capture','language-not-supported'].includes(e.error)){recPlay(c,e.error);return}res.textContent=e.error==='not-allowed'||e.error==='service-not-allowed'?'Microfono non consentito: attivalo nelle impostazioni del browser.':e.error==='no-speech'?'Non ho sentito nulla. Riprova.':e.error==='aborted'?'Interrotto. Se è apparsa la richiesta del microfono, scegli «Consenti» e premi di nuovo 🎤.':'Riconoscimento non disponibile ('+e.error+').'};
+ r.onend=()=>{fin();if(!done)res.textContent='Non ho sentito nulla. Premi 🎤 e parla subito.'};
  try{speechSynthesis&&speechSynthesis.cancel();r.start()}catch(x){res.textContent='Impossibile avviare il microfono.'}};
 function tab(f){$('les').hidden=f;$('fla').hidden=!f;$('tl').setAttribute('aria-selected',!f);$('tf').setAttribute('aria-selected',f);if(f)build()}
 $('tl').onclick=()=>tab(false);$('tf').onclick=()=>tab(true);
