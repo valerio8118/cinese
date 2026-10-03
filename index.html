@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cinese parlato · appunti e flashcard</title>
+<style>
+:root{--bg:#eef3f1;--card:#fff;--ink:#14312b;--mut:#5b716b;--line:#cfdcd7;--acc:#1f7a63;--t1:#1c6fb8;--t2:#1f7a43;--t3:#8a3fb0;--t4:#c8323c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c19;--card:#18292580;--ink:#e6f1ed;--mut:#93aaa3;--line:#2b423c;--acc:#4fc3a1;--t1:#6db4f0;--t2:#6fd08f;--t3:#c493e6;--t4:#ff7a84}}
+:root[data-theme="dark"]{--bg:#0f1c19;--card:#18292580;--ink:#e6f1ed;--mut:#93aaa3;--line:#2b423c;--acc:#4fc3a1;--t1:#6db4f0;--t2:#6fd08f;--t3:#c493e6;--t4:#ff7a84}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,"Noto Serif",serif}
+main{max-width:760px;margin:0 auto;padding:16px 14px 60px}
+h1{font-size:1.5rem;margin:8px 0 2px}p.sub{margin:0 0 14px;color:var(--mut);font-size:.95rem}
+nav{display:flex;gap:6px;margin-bottom:14px}
+nav button,.btn{font:inherit;font-size:.95rem;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+nav button[aria-selected=true],.btn.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+button:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid var(--t1);outline-offset:2px}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+summary{padding:12px 14px;font-weight:700;cursor:pointer;font-size:1.05rem}
+.body{padding:0 14px 12px}.note{color:var(--mut);font-size:.95rem;margin:0 0 8px}.note b{color:var(--ink)}
+.row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.row .sp{flex:0 0 auto;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--acc);cursor:pointer;font-size:1rem}
+.row .tx{display:flex;flex-direction:column;min-width:0}.py{font-size:1.1rem;font-weight:700}.it{color:var(--mut);font-size:.92rem}
+.t1{color:var(--t1)}.t2{color:var(--t2)}.t3{color:var(--t3)}.t4{color:var(--t4)}
+.leg{font-size:.85rem;margin:0 0 12px}.leg b{margin-right:8px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;margin:6px 0}td,th{border-top:1px solid var(--line);padding:5px 6px;text-align:left}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+select{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);max-width:100%}
+.fc{min-height:210px;background:var(--card);border:2px solid var(--line);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer;width:100%;font:inherit;color:inherit}
+.fc .big{font-size:1.7rem;font-weight:700}.fc .hint{color:var(--mut);font-size:.85rem;margin-top:10px}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.acts .btn{flex:1;min-width:110px}
+.stat{color:var(--mut);font-size:.9rem;margin:10px 0}
+</style></head><body><main>
+<h1>Cinese parlato</h1>
+<p class="sub">Solo pronuncia e conversazione: niente scrittura. I colori indicano il tono.</p>
+<nav role="tablist"><button role="tab" id="tl" aria-selected="true">Lezioni</button><button role="tab" id="tf" aria-selected="false">Flashcard</button></nav>
+<p class="leg"><b class="t1">1° alto piatto ā</b><b class="t2">2° sale á</b><b class="t3">3° scende e sale ǎ</b><b class="t4">4° cade secco à</b></p>
+<section id="les"></section>
+<section id="fla" hidden>
+<div class="ctl"><select id="deck" aria-label="Mazzo"></select><button class="btn" id="dir">Italiano → Cinese</button><button class="btn" id="shuf">Mescola</button></div>
+<button class="fc" id="card" aria-live="polite"></button>
+<div class="acts"><button class="btn" id="listen">🔊 Ascolta</button><button class="btn" id="mic">🎤 Prova a dirlo</button><button class="btn" id="no">Da ripassare</button><button class="btn" id="yes">Lo so</button></div>
+<p class="stat" id="res" aria-live="polite" style="color:var(--ink)"></p><p class="stat" id="stat"></p>
+</section>
+<script>
+const TM={ā:1,á:2,ǎ:3,à:4,ē:1,é:2,ě:3,è:4,ī:1,í:2,ǐ:3,ì:4,ō:1,ó:2,ǒ:3,ò:4,ū:1,ú:2,ǔ:3,ù:4,ǖ:1,ǘ:2,ǚ:3,ǜ:4};
+const cp=s=>s.replace(/[A-Za-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]+/g,w=>{let t=0;for(const c of w.toLowerCase())if(TM[c])t=TM[c];return t?`<b class="t${t}">${w}</b>`:w});
+const L=[
+{id:"a",t:"Lezione 1 · Cina, lingua e toni",n:"La Cina riconosce <b>56 gruppi etnici</b>; gli Han sono oltre il 90% (poi Tibetani, Uiguri, Mongoli, Miao, Hui). La lingua ufficiale è il <b>mandarino</b>; esistono anche cantonese e shanghainese.<br>Il mandarino ha <b>4 toni</b>: la stessa sillaba <i>ma</i> cambia significato. Ascolta e ripeti le quattro versioni.",r:[
+["Cina","Zhōng guó","中国"],["Pechino","Běi jīng","北京"],["Mandarino (lingua ufficiale)","Pǔ tōng huà","普通话"],
+["mamma (1° tono)","mā","妈"],["canapa (2° tono)","má","麻"],["cavallo (3° tono)","mǎ","马"],["insultare (4° tono)","mà","骂"]]},
+{id:"b",t:"Lezione 2 · Primo dialogo e pronuncia",n:"<b>Regola:</b> due sillabe di fila con 3° tono → la prima si legge come 2°. Per questo <i>nǐ hǎo</i> suona <i>ní hǎo</i>.<br><b>Suoni difficili</b> (indicativi): <b>j</b> ≈ «gi» di <i>gianni</i> · <b>q</b> ≈ «ci» di <i>cena</i>, con soffio · <b>x</b> ≈ «sci» sottile · <b>zh/ch/sh</b> come j/q/sc ma con la lingua più indietro · <b>z</b> ≈ «dz» · <b>c</b> ≈ «ts» con soffio.<br><b>Curiosità:</b> 8 (bā) è il numero fortunato, 4 (sì) quello sfortunato perché suona come «morte». Il panda è l'animale simbolo.",r:[
+["Ciao","Nǐ hǎo","你好"],["Come stai?","Nǐ hǎo ma?","你好吗？"],["Sto bene","Wǒ hěn hǎo","我很好"],["Grazie","Xiè xie","谢谢"],["Prego","Bú kè qi","不客气"]]},
+{id:"c",t:"Lezione 3 · Numeri e classificatori",n:"In cinese non si dice «tre libro»: serve un <b>classificatore</b>.<br><b>Numero + Classificatore + Nome</b> → <i>sān běn shū</i> (tre libri).<br><b>个 gè</b> è il jolly (persone, mele, telefoni). Prima di gè, «uno» diventa <i>yí</i> (yí ge rén).<br><b>2:</b> <i>èr</i> nei numeri, telefono, matematica (20 = èr shí); <i>liǎng</i> davanti ai classificatori (liǎng ge rén, mai èr ge).<table><tr><th>gè</th><td>persone, cose generiche</td><th>běn</th><td>libri</td></tr><tr><th>zhāng</th><td>oggetti piatti (tavolo, foto, biglietto)</td><th>bēi</th><td>tazze, bicchieri</td></tr><tr><th>píng</th><td>bottiglie</td><th>zhī</th><td>animali</td></tr><tr><th>liàng</th><td>veicoli</td><th>wèi</th><td>persone (cortese)</td></tr></table>",r:[
+["0","líng","零"],["1","yī","一"],["2","èr","二"],["3","sān","三"],["4","sì","四"],["5","wǔ","五"],["6","liù","六"],["7","qī","七"],["8","bā","八"],["9","jiǔ","九"],["10","shí","十"],["20","èr shí","二十"],["100","yì bǎi","一百"],["1000","yì qiān","一千"],["10.000","yí wàn","一万"],
+["tre libri","sān běn shū","三本书"],["due persone","liǎng ge rén","两个人"],["cinque mele","wǔ ge píng guǒ","五个苹果"],["un caffè (una tazza)","yì bēi kā fēi","一杯咖啡"],["due tè","liǎng bēi chá","两杯茶"],["una bottiglia d'acqua","yì píng shuǐ","一瓶水"],["un gatto","yì zhī māo","一只猫"],["due cani","liǎng zhī gǒu","两只狗"],["tre macchine","sān liàng chē","三辆车"],["due foto","liǎng zhāng zhào piàn","两张照片"]]},
+{id:"d",t:"Lezione 4 · Persone, età, soldi, date",n:"<b>Pronomi:</b> io <i>wǒ</i> · tu <i>nǐ</i> · lui/lei <i>tā</i> · noi <i>wǒ men</i> · voi <i>nǐ men</i> · loro <i>tā men</i>.<br><b>Quanti?</b> si usa <i>jǐ</i> + classificatore. <b>C'è / ci sono:</b> <i>yǒu</i>.<br>Al ristorante: «siamo in quattro» si dice <i>wǒ men sì ge rén</i> (letteralmente «noi quattro persone»).<br><b>Numeri di telefono:</b> cifra per cifra (347 = sān sì qī).<br><b>Date:</b> anno cifra per cifra + <i>nián</i>; poi mese <i>yuè</i> e giorno <i>hào</i>.",r:[
+["Quante persone?","Jǐ ge rén?","几个人？"],["Ci sono tre persone","Yǒu sān ge rén","有三个人"],["Ci sono cinque libri","Yǒu wǔ běn shū","有五本书"],
+["Siamo in quattro","Wǒ men sì ge rén","我们四个人"],["Quanti siete? (cameriere)","Jǐ wèi?","几位？"],["Siamo in quattro (cortese)","Sì wèi","四位"],["Siamo in due","Wǒ men liǎng ge rén","我们两个人"],
+["Quanti anni hai?","Nǐ jǐ suì?","你几岁？"],["Ho 20 anni","Wǒ èr shí suì","我二十岁"],
+["30 yuan","Sān shí kuài","三十块"],["100 yuan","Yì bǎi kuài","一百块"],["Anno 2026","Èr líng èr liù nián","二零二六年"],["26 giugno","Liù yuè èr shí liù hào","六月二十六号"]]},
+{id:"e",t:"Lezione 5 · Orari",n:"<b>diǎn</b> = ora in punto · <b>fēn</b> = minuti · <b>bàn</b> = e mezza · <b>yí kè</b> = un quarto · <b>sān kè</b> = tre quarti · <b>chà</b> = meno.<br>Momenti: mattina <i>zǎo shang</i> · tarda mattina <i>shàng wǔ</i> · mezzogiorno <i>zhōng wǔ</i> · pomeriggio <i>xià wǔ</i> · sera <i>wǎn shang</i>.<br>Struttura: <b>ora + diǎn + minuti</b>. Per i minuti sotto 10 si aggiunge <i>líng</i> (10:05 = shí diǎn líng wǔ fēn).",r:[
+["Che ora è?","Xiàn zài jǐ diǎn?","现在几点？"],["1:00","Yì diǎn","一点"],["3:30","Sān diǎn bàn","三点半"],["3:15","Sān diǎn yí kè","三点一刻"],["6:15","Liù diǎn shí wǔ fēn","六点十五分"],["9:40","Jiǔ diǎn sì shí","九点四十"],["10:05","Shí diǎn líng wǔ fēn","十点零五分"],["9:55 (meno 5 alle 10)","Chà wǔ fēn shí diǎn","差五分十点"],
+["A che ora apre il museo?","Bó wù guǎn jǐ diǎn kāi mén?","博物馆几点开门？"],["A che ora chiude?","Jǐ diǎn guān mén?","几点关门？"],["A che ora parte il treno?","Huǒ chē jǐ diǎn kāi?","火车几点开？"],["Apre alle 8 del mattino","Zǎo shang bā diǎn kāi","早上八点开"],["Chiude alle 9 di sera","Wǎn shang jiǔ diǎn guān mén","晚上九点关门"],["Non è ancora aperto","Xiàn zài hái méi kāi","现在还没开"],["Ha già aperto","Yǐ jīng kāi le","已经开了"]]},
+{id:"f",t:"Lezione 5 · Al ristorante",n:"<b>chī</b> = mangiare → <i>hǎo chī</i> «buono da mangiare»; <i>hǎo kàn</i> «bello da vedere». Per contrattare: <i>tài guì le</i> (è troppo caro).<br>Per chiedere qualcosa: <b>Kě yǐ gěi wǒ … ma?</b> (posso avere …?).",r:[
+["riso","mǐ fàn","米饭"],["spaghetti / noodles","miàn tiáo","面条"],["ravioli cinesi","jiǎo zi","饺子"],["zuppa","tāng","汤"],["verdure","shū cài","蔬菜"],["carne","ròu","肉"],["pesce","yú","鱼"],["pollo","jī ròu","鸡肉"],["manzo","niú ròu","牛肉"],["maiale","zhū ròu","猪肉"],["gamberi","xiā","虾"],
+["Coca Cola","kě kǒu kě lè","可口可乐"],["acqua naturale","kuàng quán shuǐ","矿泉水"],["acqua frizzante","qì pào shuǐ","气泡水"],["latte","niú nǎi","牛奶"],["tè","chá","茶"],["caffè","kā fēi","咖啡"],["mangiare","chī","吃"],["buono (da mangiare)","hǎo chī","好吃"],["bello (da vedere)","hǎo kàn","好看"],["cane","gǒu","狗"],["gatto","māo","猫"],
+["Posso avere una forchetta?","Kě yǐ gěi wǒ yì bǎ chā zi ma?","可以给我一把叉子吗？"],["Posso avere le bacchette?","Kě yǐ gěi wǒ yì shuāng kuài zi ma?","可以给我一双筷子吗？"],["Posso avere un bicchiere d'acqua?","Kě yǐ gěi wǒ yì bēi shuǐ ma?","可以给我一杯水吗？"],
+["Questo è piccante?","Zhè ge là ma?","这个辣吗？"],["Che cosa consigliate?","Yǒu shén me tuī jiàn?","有什么推荐？"],["Questo è vegetariano?","Zhè ge shì sù de ma?","这个是素的吗？"],["Vorrei questo","Wǒ xiǎng yào zhè ge","我想要这个"],["Non voglio piccante","Bú yào là","不要辣"],["Poco piccante","Shǎo fàng là","少放辣"],
+["Quanto costa?","Duō shao qián?","多少钱？"],["Quanto costa questo?","Zhè ge duō shao qián?","这个多少钱？"],["È troppo caro","Tài guì le","太贵了"],["Il conto, per favore","Mǎi dān","买单"]]},
+{id:"g",t:"Lezione 5 · Chiedere indicazioni",n:"Per chiedere: <b>Qǐng wèn</b> (scusi, posso chiedere…) + luogo + <b>zài nǎr?</b> (dov'è?).<br>Per i mezzi si usa <b>zuò</b> (prendere): <i>zuò dì tiě</i>. A piedi: <i>zǒu lù</i>. Se non capisci: <i>Qǐng nín zài shuō yí biàn, hǎo ma?</i>",r:[
+["Scusi, dov'è la stazione della metro?","Qǐng wèn, dì tiě zhàn zài nǎr?","请问，地铁站在哪儿？"],["Come si arriva al museo?","Qù bó wù guǎn zěn me zǒu?","去博物馆怎么走？"],["È lontano da qui?","Lí zhè lǐ yuǎn ma?","离这里远吗？"],["Quanto ci vuole?","Yào duō jiǔ?","要多久？"],["A piedi o in macchina?","Zǒu lù hái shì zuò chē?","走路还是坐车？"],
+["Vai dritto","Yì zhí zǒu","一直走"],["Gira a sinistra","Zuǒ zhuǎn","左转"],["Gira a destra","Yòu zhuǎn","右转"],["Attraversa la strada","Guò mǎ lù","过马路"],["Arriva al semaforo","Dào hóng lǜ dēng","到红绿灯"],["È di fronte","Zài duì miàn","在对面"],["È accanto","Zài páng biān","在旁边"],["È nelle vicinanze","Zài fù jìn","在附近"],
+["Quanto è distante?","Lí zhè lǐ yǒu duō yuǎn?","离这里有多远？"],["100 metri","Yì bǎi mǐ","一百米"],["1 chilometro","Yì gōng lǐ","一公里"],["5 minuti","Wǔ fēn zhōng","五分钟"],["Mezz'ora","Bàn ge xiǎo shí","半个小时"],["Un'ora","Yí ge xiǎo shí","一个小时"],
+["Prendere la metro","Zuò dì tiě","坐地铁"],["Prendere un taxi","Zuò chū zū chē","坐出租车"],["Andare a piedi","Zǒu lù","走路"],["Puoi ripetere, per favore?","Qǐng nín zài shuō yí biàn, hǎo ma?","请您再说一遍，好吗？"],
+["stazione","zhàn","站"],["bagno","wèi shēng jiān","卫生间"],["Dov'è il bagno?","Wèi shēng jiān zài nǎr?","卫生间在哪儿？"],["Piazza Tiananmen","Tiān ān mén guǎng chǎng","天安门广场"]]},
+{id:"h",t:"Extra · Presentarsi e cortesia",n:"Per dire il tuo nome: <b>Wǒ jiào</b> + nome. Per la nazionalità: <b>Wǒ shì</b> + paese + <b>rén</b> (persona).<br><b>Regola utile:</b> <i>bù</i> (non) davanti a un 4° tono diventa <i>bú</i>: bú shì, bú yào, bú kè qi.",r:[
+["Buongiorno","Zǎo shang hǎo","早上好"],["Buonanotte","Wǎn ān","晚安"],["Arrivederci","Zài jiàn","再见"],["Come ti chiami?","Nǐ jiào shén me míng zi?","你叫什么名字？"],["Di che paese sei?","Nǐ shì nǎ guó rén?","你是哪国人？"],["Sono italiano/a","Wǒ shì yì dà lì rén","我是意大利人"],["Piacere di conoscerti","Hěn gāo xìng rèn shi nǐ","很高兴认识你"],
+["Scusa / mi dispiace","Duì bu qǐ","对不起"],["Non fa niente","Méi guān xi","没关系"],["Scusi (per attirare l'attenzione)","Bù hǎo yì si","不好意思"],["Prego, prenda / per favore","Qǐng","请"],["Sì, è così","Shì","是"],["No, non è così","Bú shì","不是"]]},
+{id:"i",t:"Extra · Non capisco: frasi di sopravvivenza",n:"Le frasi più utili quando non segui: <i>tīng bu dǒng</i> = «ascolto ma non capisco». Con <b>huì</b> si dice che sai fare qualcosa (huì shuō = sai parlare).",r:[
+["Non capisco (quello che sento)","Wǒ tīng bu dǒng","我听不懂"],["Non capisco","Wǒ bù dǒng","我不懂"],["Ho capito","Wǒ dǒng le","我懂了"],["Più piano, per favore","Qǐng shuō màn yì diǎn","请说慢一点"],["Ripeti, per favore","Qǐng zài shuō yí biàn","请再说一遍"],["Parli inglese?","Nǐ huì shuō yīng yǔ ma?","你会说英语吗？"],["Parlo un po' di cinese","Wǒ huì shuō yì diǎn zhōng wén","我会说一点中文"],["Cos'è questo?","Zhè shì shén me?","这是什么？"],["Va bene / ok","Hǎo de","好的"],["Non c'è / non ho","Méi yǒu","没有"]]},
+{id:"j",t:"Extra · Giorni della settimana",n:"I giorni sono <b>xīng qī</b> + numero (lunedì = settimana 1). Domenica è <i>xīng qī tiān</i>. Per chiedere il giorno: <i>xīng qī jǐ?</i> (settimana quanto?).",r:[
+["oggi","jīn tiān","今天"],["domani","míng tiān","明天"],["ieri","zuó tiān","昨天"],["adesso","xiàn zài","现在"],
+["lunedì","xīng qī yī","星期一"],["martedì","xīng qī èr","星期二"],["mercoledì","xīng qī sān","星期三"],["giovedì","xīng qī sì","星期四"],["venerdì","xīng qī wǔ","星期五"],["sabato","xīng qī liù","星期六"],["domenica","xīng qī tiān","星期天"],["fine settimana","zhōu mò","周末"],
+["Che giorno è oggi?","Jīn tiān xīng qī jǐ?","今天星期几？"],["Oggi è venerdì","Jīn tiān xīng qī wǔ","今天星期五"],["Che data è oggi?","Jīn tiān jǐ yuè jǐ hào?","今天几月几号？"]]},
+{id:"k",t:"Extra · Acquisti e pagamenti",n:"<b>zhè ge</b> = questo, <b>nà ge</b> = quello. Per «un po' di più/meno» si mette <b>yì diǎn</b> dopo l'aggettivo: <i>dà yì diǎn</i> (un po' più grande). In Cina si paga spesso con il telefono (WeChat Pay, Alipay).",r:[
+["Questo","zhè ge","这个"],["Quello","nà ge","那个"],["Voglio due di questi","Wǒ yào liǎng ge","我要两个"],["Non lo voglio","Wǒ bú yào","我不要"],["Posso provarlo?","Wǒ kě yǐ shì shi ma?","我可以试试吗？"],["Un po' più grande","Dà yì diǎn","大一点"],["Un po' più piccolo","Xiǎo yì diǎn","小一点"],["Un po' più economico, va bene?","Pián yi yì diǎn, hǎo ma?","便宜一点，好吗？"],
+["Posso pagare con la carta?","Kě yǐ shuā kǎ ma?","可以刷卡吗？"],["contanti","xiàn jīn","现金"],["Pago con WeChat Pay","Wǒ yòng wēi xìn zhī fù","我用微信支付"],["Alipay","Zhī fù bǎo","支付宝"]]},
+{id:"l",t:"Extra · Hotel e trasporti",n:"Per i biglietti si usa il classificatore <b>zhāng</b> (oggetti piatti): <i>yì zhāng piào</i> = un biglietto.",r:[
+["Ho prenotato una camera","Wǒ yù dìng le fáng jiān","我预订了房间"],["passaporto","hù zhào","护照"],["camera","fáng jiān","房间"],["Quanto costa per una notte?","Yì wǎn duō shao qián?","一晚多少钱？"],["Qual è la password del Wi-Fi?","Wú xiàn wǎng mì mǎ shì shén me?","无线网密码是什么？"],["bagaglio","xíng li","行李"],
+["aeroporto","jī chǎng","机场"],["stazione dei treni","huǒ chē zhàn","火车站"],["Un biglietto per Pechino","Yì zhāng qù Běi jīng de piào","一张去北京的票"],["Mi porti qui, per favore","Qǐng dài wǒ qù zhè lǐ","请带我去这里"],["Mi fermi qui, grazie","Zài zhè lǐ tíng, xiè xie","在这里停，谢谢"]]},
+{id:"m",t:"Extra · Emergenze e salute",n:"Da conoscere bene, anche se speri di non usarle. <b>téng</b> = fa male: parte del corpo + téng.",r:[
+["Aiuto!","Jiù mìng!","救命！"],["Chiami un medico, per favore","Qǐng jiào yī shēng","请叫医生"],["Ho bisogno di un medico","Wǒ xū yào yī shēng","我需要医生"],["Dov'è l'ospedale?","Yī yuàn zài nǎr?","医院在哪儿？"],["Dov'è la farmacia?","Yào diàn zài nǎr?","药店在哪儿？"],["Non mi sento bene","Wǒ bù shū fu","我不舒服"],["Mi fa male la testa","Wǒ tóu téng","我头疼"],["Mi fa male lo stomaco","Wǒ wèi téng","我胃疼"],["Polizia","Jǐng chá","警察"],["Ho perso il passaporto","Wǒ de hù zhào diū le","我的护照丢了"]]}
+];
+const $=id=>document.getElementById(id);
+const can='speechSynthesis' in window;
+let ZV=null;const pick=()=>{ZV=speechSynthesis.getVoices().find(v=>/^zh/i.test(v.lang))||null};
+if(can){pick();speechSynthesis.onvoiceschanged=pick}
+function say(z){if(!can)return;speechSynthesis.cancel();setTimeout(()=>{const u=new SpeechSynthesisUtterance(z);u.lang='zh-CN';if(ZV)u.voice=ZV;u.rate=.8;speechSynthesis.resume();speechSynthesis.speak(u)},120)}
+$('les').innerHTML=L.map((s,i)=>`<details${i?'':' open'}><summary>${s.t}</summary><div class="body"><p class="note">${s.n}</p>${s.r.map(r=>`<div class="row">${can?`<button class="sp" data-z="${r[2]}" aria-label="Ascolta">🔊</button>`:''}<div class="tx"><span class="py">${cp(r[1])}</span><span class="it">${r[0]}</span></div></div>`).join('')}</div></details>`).join('');
+$('les').onclick=e=>{const b=e.target.closest('.sp');if(b)say(b.dataset.z)};
+// flashcards
+const ALL=L.flatMap(s=>s.r.map(r=>({id:s.id,it:r[0],py:r[1],zh:r[2],k:r[1]})));
+let known=new Set();try{known=new Set(JSON.parse(localStorage.getItem('cn-known')||'[]'))}catch(e){}
+const save=()=>{try{localStorage.setItem('cn-known',JSON.stringify([...known]))}catch(e){}};
+let deck=[],i=0,flip=false,rev=false;
+$('deck').innerHTML='<option value="all">Tutte le carte</option><option value="rep">Da ripassare</option>'+L.map(s=>`<option value="${s.id}">${s.t}</option>`).join('');
+function build(){const v=$('deck').value;deck=ALL.filter(c=>v==='all'||(v==='rep'?!known.has(c.k):c.id===v));i=0;flip=false;draw()}
+function draw(){$('res').textContent='';
+ if(!deck.length){$('card').innerHTML='<span class="big">Nessuna carta</span><span class="hint">Scegli un altro mazzo</span>';$('stat').textContent='';return}
+ const c=deck[i],front=rev?`<span class="big">${cp(c.py)}</span>`:`<span class="big">${c.it}</span>`,back=rev?`<span class="big">${c.it}</span>`:`<span class="big">${cp(c.py)}</span>`;
+ $('card').innerHTML=flip?back+`<span class="hint">${c.zh}</span>`:front+'<span class="hint">Tocca per girare</span>';
+ $('stat').textContent=`Carta ${i+1} di ${deck.length} · sapute in totale: ${known.size} su ${ALL.length}`}
+const next=()=>{if(!deck.length)return;i=(i+1)%deck.length;flip=false;draw()};
+$('card').onclick=()=>{if(!deck.length)return;flip=!flip;draw();if(flip&&!rev)say(deck[i].zh)};
+$('listen').onclick=()=>deck.length&&say(deck[i].zh);
+$('yes').onclick=()=>{if(deck.length){known.add(deck[i].k);save();next()}};
+$('no').onclick=()=>{if(deck.length){known.delete(deck[i].k);save();next()}};
+$('shuf').onclick=()=>{for(let j=deck.length-1;j>0;j--){const k=Math.floor(Math.random()*(j+1));[deck[j],deck[k]]=[deck[k],deck[j]]}i=0;flip=false;draw()};
+$('dir').onclick=()=>{rev=!rev;$('dir').textContent=rev?'Cinese → Italiano':'Italiano → Cinese';flip=false;draw()};
+$('deck').onchange=build;
+if(!can)$('listen').hidden=true;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+async function recPlay(c){const res=$('res');
+ try{const s=await navigator.mediaDevices.getUserMedia({audio:true}),m=new MediaRecorder(s),ch=[];
+ m.ondataavailable=e=>ch.push(e.data);
+ m.onstop=()=>{s.getTracks().forEach(t=>t.stop());const a=new Audio(URL.createObjectURL(new Blob(ch)));res.textContent='Ascolta la tua voce, poi quella modello: confrontale.';a.onended=()=>say(c.zh);a.play()};
+ res.textContent='🎤 Registro per 4 secondi: di\' «'+c.py+'»';m.start();setTimeout(()=>m.stop(),4000)}
+ catch(x){res.textContent='Microfono non disponibile o non consentito. Prova ad aprire la pagina in una scheda del browser.'}}
+const hz=s=>s.replace(/[^\u4e00-\u9fff]/g,'');
+function lev(a,b){const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length]}
+$('mic').onclick=()=>{
+ if(!deck.length)return;const c=deck[i],t=hz(c.zh),res=$('res');
+ if(!SR){recPlay(c);return}
+ const r=new SR();r.lang='zh-CN';r.maxAlternatives=5;r.interimResults=false;
+ res.textContent='🎤 Ti ascolto… di\' «'+c.py+'»';
+ r.onresult=e=>{
+  const alts=[...e.results[0]].map(a=>hz(a.transcript)).filter(Boolean);
+  if(!alts.length){res.textContent='Non ho sentito nulla di chiaro. Riprova.';return}
+  let best=alts[0],sc=-1;for(const a of alts){const s=1-lev(a,t)/Math.max(a.length,t.length);if(s>sc){sc=s;best=a}}
+  const diff=[...best].map((ch,k)=>ch===t[k]?ch:`<b class="t4">${ch}</b>`).join('');
+  res.innerHTML=sc>=1?'✅ Perfetto: ti ha capito esattamente.'
+   :sc>=.6?`🟡 Quasi. Ha sentito «${diff}» invece di «${t}». Le sillabe in rosso sono diverse: controlla i toni e riprova.`
+   :`🔴 Non è stato riconosciuto. Ha sentito «${best}». Premi 🔊, ascolta e ripeti più lentamente.`};
+ r.onerror=e=>{res.textContent=e.error==='not-allowed'||e.error==='service-not-allowed'?'Microfono non consentito: attivalo nelle impostazioni del browser.':e.error==='no-speech'?'Non ho sentito nulla. Riprova.':e.error==='aborted'?'Interrotto. Se è apparsa la richiesta del microfono, scegli «Consenti» e premi di nuovo 🎤.':'Riconoscimento non disponibile ('+e.error+').'};
+ try{speechSynthesis&&speechSynthesis.cancel();r.start()}catch(x){res.textContent='Impossibile avviare il microfono.'}};
+function tab(f){$('les').hidden=f;$('fla').hidden=!f;$('tl').setAttribute('aria-selected',!f);$('tf').setAttribute('aria-selected',f);if(f)build()}
+$('tl').onclick=()=>tab(false);$('tf').onclick=()=>tab(true);
+</script></main></body></html>
