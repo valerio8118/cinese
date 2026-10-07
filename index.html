@@ -118,7 +118,24 @@ function say(z){if(!can)return;
 $('les').innerHTML=L.map((s,i)=>`<details${i?'':' open'}><summary>${s.t}</summary><div class="body"><p class="note">${s.n}</p>${s.r.map(r=>r.length<2?`<div class="hd">${r[0]}</div>`:`<div class="row">${can?`<button class="sp" data-z="${r[2]}" aria-label="Ascolta">🔊</button>`:''}<div class="tx"><span class="py">${cp(r[1])}</span><span class="it">${r[0]}</span>${r[3]?`<span class="it"><i>si legge «${r[3]}»</i></span>`:''}</div></div>`).join('')}</div></details>`).join('');
 $('les').onclick=e=>{const b=e.target.closest('.sp');if(b)say(b.dataset.z)};
 // flashcards
-const ALL=L.flatMap(s=>s.nf?[]:s.r.filter(r=>r.length>1).map(r=>({id:s.id,it:r[0],py:r[1],zh:r[2],pr:r[3],k:r[1]})));
+const IN=['zh','ch','sh','b','p','m','f','d','t','n','l','g','k','h','j','q','x','r','z','c','s','y','w'];
+const FB={ā:'a',á:'a',ǎ:'a',à:'a',ē:'e',é:'e',ě:'e',è:'e',ī:'i',í:'i',ǐ:'i',ì:'i',ō:'o',ó:'o',ǒ:'o',ò:'o',ū:'u',ú:'u',ǔ:'u',ù:'u',ǖ:'ü',ǘ:'ü',ǚ:'ü',ǜ:'ü'};
+const FIN={a:'a',o:'o',e:'e',ai:'ai',ei:'ei',ao:'ao',ou:'ou',an:'an',en:'en',ang:'ang',eng:'eng',ong:'ong',er:'er',i:'i',ia:'ia',ie:'ie',iao:'iao',iu:'iu',ian:'ien',in:'in',iang:'iang',ing:'ing',iong:'iong',u:'u',ua:'ua',uo:'uo',uai:'uai',ui:'uei',uan:'uan',un:'uen',uang:'uang','ü':'ü','üe':'üe','üan':'üen','ün':'ün',ue:'üe'};
+const YW={yi:'i',ya:'ia',yao:'iao',ye:'ie',you:'iou',yan:'ien',yang:'iang',yin:'in',ying:'ing',yong:'iong',yu:'iü',yue:'iüe',yuan:'iüen',yun:'iün',wu:'u',wa:'ua',wo:'uo',wai:'uai',wei:'uei',wan:'uan',wen:'uen',wang:'uang',weng:'ueng'};
+function sy(w){
+ w=[...w.toLowerCase()].map(c=>FB[c]||c).join('');
+ let er='';if(/[a-zü]r$/.test(w)&&w!=='er'){w=w.slice(0,-1);er='r'}
+ if(YW[w])return YW[w]+er;
+ const i=IN.find(x=>w.startsWith(x))||'',f=w.slice(i.length);
+ if(f==='i'){const sp={zh:'girr',ch:'cirr',sh:'shrr',r:'rr',z:'dzz',c:'tzz',s:'ssz'};if(sp[i])return sp[i]+er}
+ const F='jqx'.includes(i)&&i&&f[0]==='u'?f.replace('u','ü'):f,fi=FIN[F];
+ if(fi===undefined)return w+er;
+ const fr=/^[ei]/.test(fi);
+ let m={b:'b',p:'p',m:'m',f:'f',d:'d',t:'t',n:'n',l:'l',h:'h',r:'r',s:'s',g:fr?'gh':'g',k:fr?'ch':'c',j:'g',q:'c',x:'s',zh:'gi',ch:'ci',sh:'sh',z:'ds',c:'tz','':''}[i];
+ if('jqx'.includes(i)&&i&&fi[0]==='ü')m+='i';
+ return m+fi+er}
+function pron(py){const o=py.replace(/[?!,.]/g,'').trim().split(/\s+/).map(sy).join(' ');return /^[A-ZĀÁǍÀĒÉĚÈĪÍǏÌŌÓǑÒŪÚǓÙ]/.test(py)?o[0].toUpperCase()+o.slice(1):o}
+const ALL=L.flatMap(s=>s.nf?[]:s.r.filter(r=>r.length>1).map(r=>({id:s.id,it:r[0],py:r[1],zh:r[2],pr:r[3]||pron(r[1]),k:r[1]})));
 let known=new Set();try{known=new Set(JSON.parse(localStorage.getItem('cn-known')||'[]'))}catch(e){}
 const save=()=>{try{localStorage.setItem('cn-known',JSON.stringify([...known]))}catch(e){}};
 let deck=[],i=0,flip=false,rev=false;
